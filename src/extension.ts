@@ -1,5 +1,10 @@
 import type { ExtensionContext } from '@podman-desktop/api';
 import * as extensionApi from '@podman-desktop/api';
+import pkg from '../package.json';
+
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
 /**
  * Below is the "typical" extension.ts file that is used to activate and deactivate the extension.
@@ -17,7 +22,7 @@ export async function activate(extensionContext: ExtensionContext): Promise<void
   const exampleWebviewHtml = `
   <html>
     <body>
-      <h1>Hello World</h1>
+      <h1>Hello World <small>v${escapeHtml(pkg.version)}</small></h1>
     </body>
   </html>
   `;
