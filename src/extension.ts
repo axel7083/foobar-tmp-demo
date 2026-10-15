@@ -1,5 +1,17 @@
 import type { ExtensionContext } from '@podman-desktop/api';
 import * as extensionApi from '@podman-desktop/api';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Read the extension version from the package.json shipped alongside the extension.
+async function readExtensionVersion(extensionContext: ExtensionContext): Promise<string> {
+  const content = await readFile(join(extensionContext.extensionUri.fsPath, 'package.json'), 'utf-8');
+  return JSON.parse(content).version;
+}
 
 /**
  * Below is the "typical" extension.ts file that is used to activate and deactivate the extension.
@@ -14,10 +26,12 @@ export async function activate(extensionContext: ExtensionContext): Promise<void
   const panel = extensionApi.window.createWebviewPanel('helloWorld', 'Hello World');
   extensionContext.subscriptions.push(panel);
 
+  const version = await readExtensionVersion(extensionContext);
+
   const exampleWebviewHtml = `
   <html>
     <body>
-      <h1>Hello World</h1>
+      <h1>Hello World <small>v${escapeHtml(version)}</small></h1>
     </body>
   </html>
   `;
