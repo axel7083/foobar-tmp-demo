@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import type { ExtensionContext } from '@podman-desktop/api';
 import * as extensionApi from '@podman-desktop/api';
 
@@ -14,10 +16,12 @@ export async function activate(extensionContext: ExtensionContext): Promise<void
   const panel = extensionApi.window.createWebviewPanel('helloWorld', 'Hello World');
   extensionContext.subscriptions.push(panel);
 
+  const pkg = JSON.parse(await readFile(join(extensionContext.extensionUri.fsPath, 'package.json'), 'utf8'));
+
   const exampleWebviewHtml = `
   <html>
     <body>
-      <h1>Hello World</h1>
+      <h1>Hello World v${pkg.version}</h1>
     </body>
   </html>
   `;
